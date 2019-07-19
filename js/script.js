@@ -116,9 +116,9 @@ var handleClientLoad = (() => {
       });
     }
 
-    change(id) {
+    change(id, start) {
       this.init().then((player) => {
-        player.loadVideoById(id);
+        player.loadVideoById(id, start);
       });
     }
   }
@@ -142,11 +142,11 @@ var handleClientLoad = (() => {
     start /= 1000;
     const videoId = settings['v'];
     if (currentVid) {
-      currentVid.change(videoId);
+      currentVid.change(videoId, start);
     } else {
       currentVid = new YoutubeVideo('player', videoId);
+      currentVid.play(start);
     }
-    currentVid.play(start);
   }
 
   function parseHash(hash) {
@@ -155,9 +155,14 @@ var handleClientLoad = (() => {
       if (!query.get('v') || !query.get('s') || !query.get('p') || !query.get('n')) {
         return null;
       }
+      const now = new Date();
+      let n = parseInt(query.get('n'), 10);
+      if (now.getTime() - n > 5) {
+        n = now.getTime();
+      }
       return {
         "v": query.get('v'),
-        "n": parseInt(query.get('n'), 10),
+        "n": n,
         "s": parseInt(query.get('s'), 10),
         "p": parseInt(query.get('p'), 10),
       };
